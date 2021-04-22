@@ -33,6 +33,12 @@ app.get("/api/persons", (req, res) => {
   res.json(notes);
 });
 
+app.get("/info", (req, res) => {
+  const totalPeople = notes.length;
+  const date = new Date();
+  res.send(`Phonebook has info for ${totalPeople} people <br> <br>${date}`);
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
