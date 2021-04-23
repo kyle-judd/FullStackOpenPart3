@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 const port = 3001;
 
 app.use(express.json());
+app.use(morgan("tiny"));
 
 let people = [
   {
@@ -37,6 +39,7 @@ const generateId = () => {
 
 app.get("/", (request, response) => {
   response.send("Hello World!");
+  next();
 });
 
 app.get("/api/persons", (req, res) => {
