@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3001;
 
-const people = [
+let people = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -25,6 +25,8 @@ const people = [
   },
 ];
 
+const convertStringToNumber = (stringNumber) => Number(stringNumber);
+
 app.get("/", (request, response) => {
   response.send("Hello World!");
 });
@@ -34,9 +36,20 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = convertStringToNumber(req.params.id);
   const person = people.find((person) => person.id === id);
   person ? res.json(person) : res.status(404).end();
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const id = convertStringToNumber(req.params.id);
+  const requestedPerson = people.find((person) => person.id === id);
+  if (requestedPerson) {
+    people = people.filter((person) => person.id !== requestedPerson.id);
+    res.status(204).end();
+  } else {
+    res.status(404).end();
+  }
 });
 
 app.get("/info", (req, res) => {
