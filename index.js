@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const port = 3001;
 
+app.use(express.json());
+
 let people = [
   {
     id: 1,
@@ -27,12 +29,38 @@ let people = [
 
 const convertStringToNumber = (stringNumber) => Number(stringNumber);
 
+const generateId = () => {
+  const maxId =
+    people.length > 0 ? Math.max(...people.map((person) => person.id)) : 0;
+  return maxId + 1;
+};
+
 app.get("/", (request, response) => {
   response.send("Hello World!");
 });
 
 app.get("/api/persons", (req, res) => {
   res.json(people);
+});
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+
+  if (!body.name && !body.number) {
+    return res.status(400).json({
+      error: "content missing",
+    });
+  }
+
+  const newPerson = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  };
+
+  people = people.concat(newPerson);
+  console.log(people);
+  res.status(201).end();
 });
 
 app.get("/api/persons/:id", (req, res) => {
