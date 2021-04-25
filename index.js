@@ -3,8 +3,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 
+app.use(express.static("build"));
 app.use(cors());
-
 app.use(express.json());
 morgan.token("person", (req, res) =>
   req.method === "POST" ? JSON.stringify(req.body) : null
@@ -45,11 +45,6 @@ const generateId = () => {
     people.length > 0 ? Math.max(...people.map((person) => person.id)) : 0;
   return maxId + 1;
 };
-
-app.get("/", (request, response) => {
-  response.send("Hello World!");
-  next();
-});
 
 app.get("/api/persons", (req, res) => {
   res.json(people);
