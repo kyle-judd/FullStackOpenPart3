@@ -1,7 +1,10 @@
 const express = require("express");
-const app = express();
 const morgan = require("morgan");
-const port = 3001;
+const cors = require("cors");
+const PORT = process.env.PORT || 3001;
+const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 morgan.token("person", (req, res) =>
@@ -102,6 +105,6 @@ app.get("/info", (req, res) => {
   res.send(`Phonebook has info for ${totalPeople} people <br> <br>${date}`);
 });
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
