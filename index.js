@@ -32,21 +32,18 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  if (people.find((person) => person.name === body.name)) {
+  /* if (people.find((person) => person.name === body.name)) {
     return res.status(400).json({
       error: "name must be unique",
     });
-  }
+  } */
 
-  const newPerson = {
-    id: generateId(),
+  const newRecord = new Record({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  people = people.concat(newPerson);
-  console.log(people);
-  res.status(201).end();
+  newRecord.save().then((response) => res.json(response));
 });
 
 app.get("/api/persons/:id", (req, res) => {
