@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 const Record = require("./models/record");
+const { response } = require("express");
 
 app.use(express.static("build"));
 app.use(cors());
@@ -17,12 +18,6 @@ app.use(
   )
 );
 
-// const convertStringToNumber = (stringNumber) => Number(stringNumber);
-
-app.get("/api/persons", (req, res) => {
-  Record.find({}).then((results) => res.json(results));
-});
-
 app.post("/api/persons", (req, res) => {
   const body = req.body;
 
@@ -32,12 +27,6 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  /* if (people.find((person) => person.name === body.name)) {
-    return res.status(400).json({
-      error: "name must be unique",
-    });
-  } */
-
   const newRecord = new Record({
     name: body.name,
     number: body.number,
@@ -46,27 +35,41 @@ app.post("/api/persons", (req, res) => {
   newRecord.save().then((response) => res.json(response));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = convertStringToNumber(req.params.id);
-  const person = people.find((person) => person.id === id);
-  person ? res.json(person) : res.status(404).end();
+app.get("/api/persons/:id", (req, res, next) => {
+  Record.findById(req.params.id)
+    .then((record) => (record ? res.json(record) : res.status(404).end()))
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = convertStringToNumber(req.params.id);
-  const requestedPerson = people.find((person) => person.id === id);
-  if (requestedPerson) {
-    people = people.filter((person) => person.id !== requestedPerson.id);
-    res.status(204).end();
-  } else {
-    res.status(404).end();
-  }
+app.delete("/api/persons/:id", (req, res, next) => {
+  Record.findByIdAndDelete(req.params.id)
+    .then((result) => {
+      console.log(result);
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/info", (req, res) => {
   const totalPeople = notes.length;
   const date = new Date();
   res.send(`Phonebook has info for ${totalPeople} people <br> <br>${date}`);
+});
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
+app.get("/api/persons", (req, res) => {
+  Record.find({}).then((results) => res.json(results));
 });
 
 const PORT = process.env.PORT || 3001;
