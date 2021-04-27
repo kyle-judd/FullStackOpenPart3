@@ -18,6 +18,19 @@ app.use(
   )
 );
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+
+  const record = {
+    ...body,
+    number: body.number,
+  };
+
+  Record.findByIdAndUpdate(req.params.id, record, { new: true })
+    .then((updatedRecord) => res.json(updatedRecord))
+    .catch((error) => next(error));
+});
+
 app.post("/api/persons", (req, res) => {
   const body = req.body;
 
@@ -51,9 +64,12 @@ app.delete("/api/persons/:id", (req, res, next) => {
 });
 
 app.get("/info", (req, res) => {
-  const totalPeople = notes.length;
-  const date = new Date();
-  res.send(`Phonebook has info for ${totalPeople} people <br> <br>${date}`);
+  Record.countDocuments({}).then((count) => {
+    const date = new Date();
+    res.send(
+      `The total number of records is ${count} <br><br> Date is: ${date}`
+    );
+  });
 });
 
 const errorHandler = (error, request, response, next) => {
