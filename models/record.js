@@ -17,11 +17,13 @@ mongoose
 const phonebookSchema = new mongoose.Schema({
   name: {
     type: String,
+    minLength: 3,
     required: true,
     unique: true,
   },
   number: {
     type: String,
+    min: 8,
     required: true,
     unique: true,
   },
